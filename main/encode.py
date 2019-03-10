@@ -66,3 +66,28 @@ class VigenereDecoder(Encoder):
     def calc(self, symbol: str, position: int):
         code_a = ord('A') if symbol.isupper() else ord('a')
         return chr(code_a + (ord(symbol) - ord(self.key[position % len(self.key)]) + 26) % 26)
+
+
+class VernamEncoder:
+
+    def __init__(self, key):
+        self.key = int(key)
+
+    def encode(self, message):
+        binary_message = ''
+        for symbol in message:
+            binary_message += bin(ord(symbol))[2:]
+        return bin(int(binary_message, 2) ^ self.key)[2:]
+
+
+class VernamDecoder:
+
+    def __init__(self, key):
+        self.key = int(key)
+
+    def encode(self, message):
+        binary_result = bin(self.key ^ int(message, 2))[2:]
+        result = ''
+        for symbol in range(0, len(binary_result), 7):
+            result += chr(int(binary_result[symbol:symbol + 7], 2))
+        return result
