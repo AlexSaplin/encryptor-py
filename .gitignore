@@ -1,3 +1,5 @@
 
 *.iml
 *.xml
+main/__pycache__/encode.cpython-36.pyc
+*.pyc
