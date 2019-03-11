@@ -2,6 +2,7 @@ import abc
 
 
 class Encoder:
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -43,7 +44,7 @@ class VigenereEncoder(Encoder):
 
     def calc(self, symbol: str, position: int):
         code_a = ord('A') if symbol.isupper() else ord('a')
-        return chr(code_a + (ord(symbol) + ord(self.key[position % len(self.key)]) - 2 * code_a) % 26)
+        return chr(code_a + (ord(symbol) + ord(self.key[position % len(self.key)]) - code_a - ord('a')) % 26)
 
 
 class CaesarDecoder(Encoder):
@@ -85,7 +86,7 @@ class VernamDecoder:
     def __init__(self, key):
         self.key = int(key)
 
-    def encode(self, message):
+    def encode(self, message: str):
         binary_result = bin(self.key ^ int(message, 2))[2:]
         result = ''
         for symbol in range(0, len(binary_result), 7):
