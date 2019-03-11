@@ -1,5 +1,6 @@
 import argparse
 
+
 def get_args():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -29,6 +30,7 @@ def get_args():
     # hack
     parser_hack = subparsers.add_parser('hack', help='Hack help')
     parser_hack.set_defaults(mode='hack')
+    parser_hack.add_argument('--cipher', choices=['caesar', 'vigenere'], help='Cipher type')
     parser_hack.add_argument('--input-file', type=argparse.FileType('r'), help='Input file')
     parser_hack.add_argument('--output-file', type=argparse.FileType('w'), help='Output file')
     parser_hack.add_argument('--model-file', type=argparse.FileType('r'), help='Model file')
