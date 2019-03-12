@@ -6,6 +6,9 @@ from main.train import DefaultTrainer
 
 
 class Hacker:
+    """
+    Abstract class for hacking text
+    """
 
     __metaclass__ = abc.ABCMeta
 
@@ -15,10 +18,18 @@ class Hacker:
 
     @abc.abstractmethod
     def hack(self, text: str):
+        """
+        Decrypt text
+        :param text: Text to decrypt
+        :return: Decrypted text
+        """
         pass
 
 
 class CaesarHacker(Hacker):
+    """
+    Class for hacking Caesar cipher using frequency model
+    """
 
     def __init__(self, model):
         super().__init__(model)
@@ -26,6 +37,11 @@ class CaesarHacker(Hacker):
         self.trainer = DefaultTrainer()
 
     def hack(self, text: str):
+        """
+        Decrypt text, encrypted by Caesar cipher, with frequency model
+        :param text: Text to decrypt
+        :return: Decrypted text
+        """
         results = [0 for shift in range(26)]
         shift_result = 0
 
@@ -44,12 +60,20 @@ class CaesarHacker(Hacker):
 
 
 class CaesarBonusHacker(Hacker):
+    """
+    Class for hacking Caesar cipher using 3-chart frequency model
+    """
 
     def __init__(self, model):
         super().__init__(model)
         self.caesar_decoders = [CaesarDecoder(shift) for shift in range(26)]
 
     def hack(self, text: str):
+        """
+        Decrypt text, encrypted by Caesar cipher, with 3-chart frequency model
+        :param text: Text to decrypt
+        :return: Decrypted text
+        """
         results = [0 for shift in range(26)]
         shift_result = 0
 
@@ -74,6 +98,9 @@ class CaesarBonusHacker(Hacker):
 
 
 class VigenereHacker(Hacker):
+    """
+    Class for hacking Vigenere cipher using frequency model and coincidence index method
+    """
 
     def __init__(self, model):
         super().__init__(model)
@@ -83,6 +110,11 @@ class VigenereHacker(Hacker):
             raise KeyError('Wrong model format')
 
     def calc_coincidence_index(self, text: str):
+        """
+        Calculate coincidence index
+        :param text: Text for calculating
+        :return: Coincidence index for text
+        """
         count = [0 for letter in range(26)]
         sum_count = 0
 
@@ -100,13 +132,24 @@ class VigenereHacker(Hacker):
 
         return result
 
-    def check_len(self, text: str, length: int):
+    def check_length(self, text: str, length: int):
+        """
+        Checks cipher's key length
+        :param text: Text for calculating
+        :param length: Key length
+        :return: Calculated coincidence index for length
+        """
         current_text = ''
         for position in range(0, len(text), length):
             current_text += text[position]
         return self.calc_coincidence_index(current_text)
 
     def hack(self, text: str):
+        """
+        Decrypt text, encrypted by Vigenere cipher, with frequency model and coincidence index method
+        :param text: Text to decrypt
+        :return: Decrypted text
+        """
         letter_text = ''
         for letter in text:
             if letter.isalpha():
@@ -114,7 +157,7 @@ class VigenereHacker(Hacker):
 
         len_ic = []
         for length in range(1, len(letter_text)):
-            len_ic.append(self.check_len(letter_text, length))
+            len_ic.append(self.check_length(letter_text, length))
 
         key_len = 1
         for length, coincidence_index in enumerate(len_ic):

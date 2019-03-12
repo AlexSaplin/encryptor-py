@@ -4,6 +4,9 @@ import string
 
 
 class Trainer:
+    """
+    Abstract class for model builders
+    """
 
     __metaclass__ = abc.ABCMeta
 
@@ -13,21 +16,39 @@ class Trainer:
 
     @abc.abstractmethod
     def feed(self, text: str):
+        """
+        Update model
+        :param text: Text for feeding
+        """
         pass
 
     @abc.abstractmethod
     def clear(self):
+        """
+        Clear all data
+        """
         pass
 
     @abc.abstractmethod
     def get_model(self):
+        """
+        Get model
+        :return: Model
+        """
         pass
 
     def get_json_model(self):
+        """
+        Get model in json format
+        :return: Model in json format
+        """
         return json.dumps(self.get_model())
 
 
 class DefaultTrainer(Trainer):
+    """
+    Class for building frequency model and calculating coincidence index
+    """
 
     def __init__(self):
         super().__init__()
@@ -35,16 +56,27 @@ class DefaultTrainer(Trainer):
         self.letter_count = 0
 
     def feed(self, text: str):
+        """
+        Update model
+        :param text: Text for feeding
+        """
         for symbol in text.lower():
             if symbol.isalpha():
                 self.count[symbol] = self.count.get(symbol, 0) + 1
                 self.letter_count += 1
 
     def clear(self):
+        """
+        Clear all data
+        """
         self.count.clear()
         self.letter_count = 0
 
     def get_model(self):
+        """
+        Get frequency model with coincidence index
+        :return: Frequency model with coincidence index
+        """
         result = {'coincidence_index': 0}
 
         for letter in string.ascii_lowercase:
@@ -57,6 +89,9 @@ class DefaultTrainer(Trainer):
 
 
 class BonusTrainer(Trainer):
+    """
+    Class for building 3-chart frequency model
+    """
 
     def __init__(self):
         super().__init__()
@@ -69,6 +104,10 @@ class BonusTrainer(Trainer):
                     self.count[letter_last][letter][letter_next] = 0
 
     def feed(self, text: str):
+        """
+        Update model
+        :param text: Text for feeding
+        """
         text = text.lower()
         for index in range(2, len(text)):
             letter_count = 0
@@ -78,7 +117,14 @@ class BonusTrainer(Trainer):
                 self.count[text[index - 2]][text[index - 1]][text[index]] += 1
 
     def clear(self):
+        """
+        Clear all data
+        """
         self.count = {}
 
     def get_model(self):
+        """
+        Get 3-chart frequency model
+        :return: 3-chart frequency model
+        """
         return self.count
