@@ -1,9 +1,8 @@
 import abc
 import string
-from tqdm import tqdm
 
 from main.encode import CaesarDecoder
-from main.train import Trainer
+from main.train import DefaultTrainer
 
 
 class Hacker:
@@ -24,29 +23,64 @@ class CaesarHacker(Hacker):
     def __init__(self, model):
         super().__init__(model)
         self.caesar_decoders = [CaesarDecoder(shift) for shift in range(26)]
-        self.trainer = Trainer()
+        self.trainer = DefaultTrainer()
 
     def hack(self, text: str):
         results = [0 for shift in range(26)]
-        shift_results = 0
+        shift_result = 0
 
         for shift in range(26):
             self.trainer.feed(self.caesar_decoders[shift].encode(text))
             current_model = self.trainer.get_model()
+
             for letter in string.ascii_lowercase:
                 results[shift] += (self.model.get(letter, 0) - current_model.get(letter, 0)) ** 2
-            self.trainer.clear()
-            if results[shift] < results[shift_results]:
-                shift_results = shift
 
-        return self.caesar_decoders[shift_results].encode(text)
+            self.trainer.clear()
+            if results[shift] < results[shift_result]:
+                shift_result = shift
+
+        return self.caesar_decoders[shift_result].encode(text)
+
+
+class CaesarBonusHacker(Hacker):
+
+    def __init__(self, model):
+        super().__init__(model)
+        self.caesar_decoders = [CaesarDecoder(shift) for shift in range(26)]
+
+    def hack(self, text: str):
+        results = [0 for shift in range(26)]
+        shift_result = 0
+
+        for shift in range(26):
+            current_text = self.caesar_decoders[shift].encode(text).lower()
+
+            for index in range(2, len(current_text)):
+                letter_count = 0
+                for position in range(3):
+                    letter_count += 1 if current_text[index - position].isalpha() else 0
+                if letter_count == 3:
+                    try:
+                        results[shift] += \
+                            self.model[current_text[index - 2]][current_text[index - 1]][current_text[index]]
+                    except KeyError:
+                        raise KeyError('Wrong model format')
+
+            if results[shift] > results[shift_result]:
+                shift_result = shift
+
+        return self.caesar_decoders[shift_result].encode(text)
 
 
 class VigenereHacker(Hacker):
 
     def __init__(self, model):
         super().__init__(model)
-        self.coincidence_index = self.model['coincidence_index']
+        try:
+            self.coincidence_index = self.model['coincidence_index']
+        except KeyError:
+            raise KeyError('Wrong model format')
 
     def calc_coincidence_index(self, text: str):
         count = [0 for letter in range(26)]

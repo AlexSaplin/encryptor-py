@@ -13,10 +13,10 @@ class Encoder:
     def calc(self, symbol: str, position: int):
         pass
 
-    def encode(self, message: str):
+    def encode(self, text: str):
         result = ''
         position = 0
-        for symbol in message:
+        for symbol in text:
             if symbol.isalpha():
                 result += self.calc(symbol, position)
                 position += 1
@@ -74,11 +74,11 @@ class VernamEncoder:
     def __init__(self, key):
         self.key = int(key)
 
-    def encode(self, message):
-        binary_message = ''
-        for symbol in message:
-            binary_message += bin(ord(symbol))[2:]
-        return bin(int(binary_message, 2) ^ self.key)[2:]
+    def encode(self, text):
+        binary_text = ''
+        for symbol in text:
+            binary_text += bin(ord(symbol))[2:]
+        return bin(int(binary_text, 2) ^ self.key)[2:]
 
 
 class VernamDecoder:
@@ -86,8 +86,8 @@ class VernamDecoder:
     def __init__(self, key):
         self.key = int(key)
 
-    def encode(self, message: str):
-        binary_result = bin(self.key ^ int(message, 2))[2:]
+    def encode(self, text: str):
+        binary_result = bin(self.key ^ int(text, 2))[2:]
         result = ''
         for symbol in range(0, len(binary_result), 7):
             result += chr(int(binary_result[symbol:symbol + 7], 2))
