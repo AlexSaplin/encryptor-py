@@ -1,9 +1,9 @@
+import argparse
 import json
 import sys
 
 from main.encode import CaesarEncoder, VigenereEncoder, CaesarDecoder, VigenereDecoder, VernamEncoder, VernamDecoder
 from main.hack import CaesarHacker, CaesarBonusHacker, VigenereHacker
-from main.parser import get_args
 from main.text_checker import TextChecker
 from main.train import DefaultTrainer, BonusTrainer
 
@@ -17,11 +17,12 @@ def encode(args):
         encoder = VernamEncoder(args.key)
     else:
         encoder = CaesarEncoder(args.key) if args.cipher == 'caesar' else VigenereEncoder(args.key)
-    text = ''
-    for line in sys.stdin:
-        text += line
+    text = args.input_file.read() if args.input_file else sys.stdin.read()
     TextChecker.check(text)
-    sys.stdout.write(encoder.encode(text))
+    if args.output_file:
+        args.output_file.write(encoder.encode(text))
+    else:
+        sys.stdout.write(encoder.encode(text))
 
 
 def decode(args):
@@ -30,14 +31,15 @@ def decode(args):
     if args.output_file:
         sys.stdout = args.output_file
     if args.cipher == 'vernam':
-        encoder = VernamDecoder(args.key)
+        decoder = VernamDecoder(args.key)
     else:
-        encoder = CaesarDecoder(args.key) if args.cipher == 'caesar' else VigenereDecoder(args.key)
-    text = ''
-    for line in sys.stdin:
-        text += line
+        decoder = CaesarDecoder(args.key) if args.cipher == 'caesar' else VigenereDecoder(args.key)
+    text = args.input_file.read() if args.input_file else sys.stdin.read()
     TextChecker.check(text)
-    sys.stdout.write(encoder.encode(text))
+    if args.output_file:
+        args.output_file.write(decoder.encode(text))
+    else:
+        sys.stdout.write(decoder.encode(text))
 
 
 def train(args):
@@ -45,12 +47,13 @@ def train(args):
         sys.stdin = args.text_file
     sys.stdout = args.model_file
     trainer = BonusTrainer() if args.bonus_mode else DefaultTrainer()
-    text = ''
-    for line in sys.stdin:
-        text += line
+    text = args.input_file.read() if args.input_file else sys.stdin.read()
     TextChecker.check(text)
     trainer.feed(text)
-    sys.stdout.write(trainer.get_json_model())
+    if args.output_file:
+        args.output_file.write(trainer.get_json_model())
+    else:
+        sys.stdout.write(trainer.get_json_model())
 
 
 def hack(args):
@@ -62,7 +65,6 @@ def hack(args):
         sys.stdin = args.input_file
     if args.output_file:
         sys.stdout = args.output_file
-    text = ''
     if args.bonus_mode:
         if args.cipher == 'vigenere':
             raise NotImplementedError('Current version does not support bonus hack for vigenere cipher')
@@ -70,23 +72,50 @@ def hack(args):
             hacker = CaesarBonusHacker(model)
     else:
         hacker = CaesarHacker(model) if args.cipher == 'caesar' else VigenereHacker(model)
-    for line in sys.stdin:
-        text += line
+    text = args.input_file.read() if args.input_file else sys.stdin.read()
     TextChecker.check(text)
-    sys.stdout.write(hacker.hack(text))
+    if args.output_file:
+        args.output_file.write(hacker.hack(text))
+    else:
+        sys.stdout.write(hacker.hack(text))
 
 
 if __name__ == '__main__':
-    arguments = get_args()
+    parser = argparse.ArgumentParser(description='Allows you to work with caesar/vigenere/vernam ciphers.',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    subparsers = parser.add_subparsers()
 
-    if arguments.mode == 'encode':
-        encode(arguments)
+    # encode
+    parser_encode = subparsers.add_parser('encode', help='Encode help')
+    parser_encode.set_defaults(mode='encode', func=encode)
+    parser_encode.add_argument('--cipher', choices=['caesar', 'vigenere', 'vernam'], help='Cipher type', required=True)
+    parser_encode.add_argument('--key', help='Cipher key', required=True)
+    parser_encode.add_argument('--input-file', type=argparse.FileType('r'), help='Input file')
+    parser_encode.add_argument('--output-file', type=argparse.FileType('w'), help='Output file')
 
-    if arguments.mode == 'decode':
-        decode(arguments)
+    # decode
+    parser_decode = subparsers.add_parser('decode', help='Decode help')
+    parser_decode.set_defaults(mode='decode', func=decode)
+    parser_decode.add_argument('--cipher', choices=['caesar', 'vigenere', 'vernam'], help='Cipher type', required=True)
+    parser_decode.add_argument('--key', help='Cipher key', required=True)
+    parser_decode.add_argument('--input-file', type=argparse.FileType('r'), help='Input file')
+    parser_decode.add_argument('--output-file', type=argparse.FileType('w'), help='Output file')
 
-    if arguments.mode == 'train':
-        train(arguments)
+    # train
+    parser_train = subparsers.add_parser('train', help='Train help')
+    parser_train.set_defaults(mode='train', func=train)
+    parser_train.add_argument('--text-file', type=argparse.FileType('r'), help='Input file')
+    parser_train.add_argument('--model-file', type=argparse.FileType('w'), help='Model file', required=True)
+    parser_train.add_argument('--bonus', dest='bonus_mode', action='store_true')
 
-    if arguments.mode == 'hack':
-        hack(arguments)
+    # hack
+    parser_hack = subparsers.add_parser('hack', help='Hack help')
+    parser_hack.set_defaults(mode='hack', func=hack)
+    parser_hack.add_argument('--cipher', choices=['caesar', 'vigenere'], help='Cipher type', required=True)
+    parser_hack.add_argument('--input-file', type=argparse.FileType('r'), help='Input file')
+    parser_hack.add_argument('--output-file', type=argparse.FileType('w'), help='Output file')
+    parser_hack.add_argument('--model-file', type=argparse.FileType('r'), help='Model file', required=True)
+    parser_hack.add_argument('--bonus', dest='bonus_mode', action='store_true')
+
+    arguments = parser.parse_args()
+    arguments.func(arguments)
