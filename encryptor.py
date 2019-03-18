@@ -9,10 +9,6 @@ from main.train import DefaultTrainer, BonusTrainer
 
 
 def encode(args):
-    if args.input_file:
-        sys.stdin = args.input_file
-    if args.output_file:
-        sys.stdout = args.output_file
     if args.cipher == 'vernam':
         encoder = VernamEncoder(args.key)
     else:
@@ -26,10 +22,6 @@ def encode(args):
 
 
 def decode(args):
-    if args.input_file:
-        sys.stdin = args.input_file
-    if args.output_file:
-        sys.stdout = args.output_file
     if args.cipher == 'vernam':
         decoder = VernamDecoder(args.key)
     else:
@@ -43,17 +35,11 @@ def decode(args):
 
 
 def train(args):
-    if args.text_file:
-        sys.stdin = args.text_file
-    sys.stdout = args.model_file
     trainer = BonusTrainer() if args.bonus_mode else DefaultTrainer()
     text = args.input_file.read() if args.input_file else sys.stdin.read()
     TextChecker.check(text)
     trainer.feed(text)
-    if args.output_file:
-        args.output_file.write(trainer.get_json_model())
-    else:
-        sys.stdout.write(trainer.get_json_model())
+    args.model_file.write(trainer.get_json_model())
 
 
 def hack(args):
@@ -61,10 +47,6 @@ def hack(args):
         model = json.load(args.model_file)
     except json.JSONDecodeError:
         raise Exception('Incorrect model file')
-    if args.input_file:
-        sys.stdin = args.input_file
-    if args.output_file:
-        sys.stdout = args.output_file
     if args.bonus_mode:
         if args.cipher == 'vigenere':
             raise NotImplementedError('Current version does not support bonus hack for vigenere cipher')
