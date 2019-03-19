@@ -36,7 +36,7 @@ def decode(args):
 
 def train(args):
     trainer = BonusTrainer() if args.bonus_mode else DefaultTrainer()
-    text = args.input_file.read() if args.input_file else sys.stdin.read()
+    text = args.text_file.read() if args.text_file else sys.stdin.read()
     TextChecker.check(text)
     trainer.feed(text)
     args.model_file.write(trainer.get_json_model())
