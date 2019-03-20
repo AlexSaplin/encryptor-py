@@ -116,7 +116,7 @@ class VigenereDecoder(Encoder):
         :return: Calculated symbol
         """
         code_a = ord('A') if symbol.isupper() else ord('a')
-        return chr(code_a + (ord(symbol) - ord(self.key[position % len(self.key)]) + 26) % 26)
+        return chr(code_a + (ord(symbol) - code_a - ord(self.key[position % len(self.key)]) + ord('a') + 26) % 26)
 
 
 class VernamEncoder:
