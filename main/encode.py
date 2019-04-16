@@ -30,15 +30,15 @@ class Encoder:
         :param text: text to encode/decode
         :return: Encoded/decoded text
         """
-        result = ''
+        result = []
         position = 0
         for symbol in text:
             if symbol.isalpha():
-                result += self.calc(symbol, position)
+                result.append(self.calc(symbol, position))
                 position += 1
             else:
-                result += symbol
-        return result
+                result.append(symbol)
+        return ''.join(result)
 
 
 class CaesarEncoder(Encoder):
@@ -137,10 +137,10 @@ class VernamEncoder:
         :param text: text to encode/decode
         :return: Encoded/decoded text
         """
-        binary_text = ''
+        binary_text = []
         for symbol in text:
-            binary_text += bin(ord(symbol))[2:]
-        return bin(int(binary_text, 2) ^ self.key)[2:]
+            binary_text.append(bin(ord(symbol))[2:])
+        return bin(int(''.join(binary_text), 2) ^ self.key)[2:]
 
 
 class VernamDecoder:
@@ -158,7 +158,7 @@ class VernamDecoder:
         :return: Encoded/decoded text
         """
         binary_result = bin(self.key ^ int(text, 2))[2:]
-        result = ''
+        result = []
         for symbol in range(0, len(binary_result), ASCII_BIT_COUNT):
-            result += chr(int(binary_result[symbol:symbol + ASCII_BIT_COUNT], 2))
-        return result
+            result.append(chr(int(binary_result[symbol:symbol + ASCII_BIT_COUNT], 2)))
+        return ''.join(result)

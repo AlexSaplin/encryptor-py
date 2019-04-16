@@ -139,10 +139,10 @@ class VigenereHacker(Hacker):
         :param length: Key length
         :return: Calculated coincidence index for length
         """
-        current_text = ''
+        current_text = []
         for position in range(0, len(text), length):
-            current_text += text[position]
-        return self.calc_coincidence_index(current_text)
+            current_text.append(text[position])
+        return self.calc_coincidence_index(''.join(current_text))
 
     def hack(self, text: str):
         """
@@ -150,10 +150,12 @@ class VigenereHacker(Hacker):
         :param text: Text to decrypt
         :return: Decrypted text
         """
-        letter_text = ''
+        letters = []
         for letter in text:
             if letter.isalpha():
-                letter_text += letter.lower()
+                letters.append(letter.lower())
+
+        letter_text = ''.join(letters)
 
         len_ic = []
         for length in range(1, len(letter_text)):
@@ -173,7 +175,7 @@ class VigenereHacker(Hacker):
         for index in range(key_len):
             strings[index] = caesar_hacker.hack(strings[index])
 
-        result = ''
+        result = []
 
         letter_id = 0
         for letter in text:
@@ -181,9 +183,9 @@ class VigenereHacker(Hacker):
                 symbol = strings[letter_id % key_len][letter_id // key_len]
                 if letter.isupper():
                     symbol = symbol.upper()
-                result += symbol
+                result.append(symbol)
                 letter_id += 1
             else:
-                result += letter
+                result.append(letter)
 
-        return result
+        return ''.join(result)
