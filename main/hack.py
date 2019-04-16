@@ -68,11 +68,12 @@ class CaesarHacker(Hacker):
 
 class CaesarBonusHacker(Hacker):
     """
-    Class for hacking Caesar cipher using 3-chart frequency model
+    Class for hacking Caesar cipher using n-chart frequency model
     """
 
-    def __init__(self, model):
+    def __init__(self, model, n):
         super().__init__(model)
+        self.n = n
         self.caesar_decoders = [CaesarDecoder(shift) for shift in range(ALPHABET_POWER)]
 
     def hack(self, text: str):
@@ -87,16 +88,10 @@ class CaesarBonusHacker(Hacker):
         for shift in range(ALPHABET_POWER):
             current_text = self.caesar_decoders[shift].encode(text).lower()
 
-            for index in range(2, len(current_text)):
-                letter_count = 0
-                for position in range(3):
-                    letter_count += 1 if current_text[index - position].isalpha() else 0
-                if letter_count == 3:
-                    try:
-                        results[shift] += \
-                            self.model[current_text[index - 2]][current_text[index - 1]][current_text[index]]
-                    except KeyError:
-                        raise KeyError('Wrong model format')
+            for index in range(0, len(current_text) - self.n + 1):
+                current_slice = current_text[index:index + self.n]
+                if current_slice.isalpha():
+                    results[shift] += self.model.get(current_slice, 0)
 
             if results[shift] > results[shift_result]:
                 shift_result = shift

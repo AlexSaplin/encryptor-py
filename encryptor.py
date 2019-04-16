@@ -35,7 +35,7 @@ def decode(args):
 
 
 def train(args):
-    trainer = BonusTrainer() if args.bonus_mode else DefaultTrainer()
+    trainer = BonusTrainer(args.n) if args.bonus_mode else DefaultTrainer()
     text = args.text_file.read() if args.text_file else sys.stdin.read()
     TextChecker.check(text)
     trainer.feed(text)
@@ -51,7 +51,7 @@ def hack(args):
         if args.cipher == 'vigenere':
             raise NotImplementedError('Current version does not support bonus hack for vigenere cipher')
         else:
-            hacker = CaesarBonusHacker(model)
+            hacker = CaesarBonusHacker(model, args.n)
     else:
         hacker = CaesarHacker(model) if args.cipher == 'caesar' else VigenereHacker(model)
     text = args.input_file.read() if args.input_file else sys.stdin.read()
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     parser_train.add_argument('--text-file', type=argparse.FileType('r'), help='Input file')
     parser_train.add_argument('--model-file', type=argparse.FileType('w'), help='Model file', required=True)
     parser_train.add_argument('--bonus', dest='bonus_mode', action='store_true')
+    parser_train.add_argument('--n', type=int, help='Size of a n-chart model')
 
     # hack
     parser_hack = subparsers.add_parser('hack', help='Hack help')
@@ -98,6 +99,7 @@ if __name__ == '__main__':
     parser_hack.add_argument('--output-file', type=argparse.FileType('w'), help='Output file')
     parser_hack.add_argument('--model-file', type=argparse.FileType('r'), help='Model file', required=True)
     parser_hack.add_argument('--bonus', dest='bonus_mode', action='store_true')
+    parser_train.add_argument('--n', type=int, help='Size of a n-chart model')
 
     arguments = parser.parse_args()
     arguments.func(arguments)

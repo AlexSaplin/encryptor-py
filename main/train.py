@@ -90,18 +90,13 @@ class DefaultTrainer(Trainer):
 
 class BonusTrainer(Trainer):
     """
-    Class for building 3-chart frequency model
+    Class for building n-chart frequency model
     """
 
-    def __init__(self):
+    def __init__(self, n):
         super().__init__()
         self.count = {}
-        for letter_last in string.ascii_lowercase:
-            self.count[letter_last] = {}
-            for letter in string.ascii_lowercase:
-                self.count[letter_last][letter] = {}
-                for letter_next in string.ascii_lowercase:
-                    self.count[letter_last][letter][letter_next] = 0
+        self.n = n
 
     def feed(self, text: str):
         """
@@ -109,12 +104,10 @@ class BonusTrainer(Trainer):
         :param text: Text for feeding
         """
         text = text.lower()
-        for index in range(2, len(text)):
-            letter_count = 0
-            for position in range(3):
-                letter_count += 1 if text[index - position].isalpha() else 0
-            if letter_count == 3:
-                self.count[text[index - 2]][text[index - 1]][text[index]] += 1
+        for index in range(0, len(text) - self.n + 1):
+            current_slice = text[index:index + self.n]
+            if current_slice.isalpha():
+                self.count[current_slice] = self.count.get(current_slice, 0) + 1
 
     def clear(self):
         """
@@ -124,7 +117,7 @@ class BonusTrainer(Trainer):
 
     def get_model(self):
         """
-        Get 3-chart frequency model
-        :return: 3-chart frequency model
+        Get n-chart frequency model
+        :return: n-chart frequency model
         """
         return self.count
