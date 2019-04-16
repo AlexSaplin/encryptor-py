@@ -3,7 +3,7 @@ import string
 
 from main.encode import CaesarDecoder
 from main.train import DefaultTrainer
-
+from main.config import ALPHABET_POWER
 
 class Hacker:
     """
@@ -33,7 +33,7 @@ class CaesarHacker(Hacker):
 
     def __init__(self, model):
         super().__init__(model)
-        self.caesar_decoders = [CaesarDecoder(shift) for shift in range(26)]
+        self.caesar_decoders = [CaesarDecoder(shift) for shift in range(ALPHABET_POWER)]
         self.trainer = DefaultTrainer()
 
     def hack(self, text: str):
@@ -42,10 +42,10 @@ class CaesarHacker(Hacker):
         :param text: Text to decrypt
         :return: Decrypted text
         """
-        results = [0 for shift in range(26)]
+        results = [0 for shift in range(ALPHABET_POWER)]
         shift_result = 0
 
-        for shift in range(26):
+        for shift in range(ALPHABET_POWER):
             self.trainer.feed(self.caesar_decoders[shift].encode(text))
             current_model = self.trainer.get_model()
 
@@ -66,7 +66,7 @@ class CaesarBonusHacker(Hacker):
 
     def __init__(self, model):
         super().__init__(model)
-        self.caesar_decoders = [CaesarDecoder(shift) for shift in range(26)]
+        self.caesar_decoders = [CaesarDecoder(shift) for shift in range(ALPHABET_POWER)]
 
     def hack(self, text: str):
         """
@@ -74,10 +74,10 @@ class CaesarBonusHacker(Hacker):
         :param text: Text to decrypt
         :return: Decrypted text
         """
-        results = [0 for shift in range(26)]
+        results = [0 for shift in range(ALPHABET_POWER)]
         shift_result = 0
 
-        for shift in range(26):
+        for shift in range(ALPHABET_POWER):
             current_text = self.caesar_decoders[shift].encode(text).lower()
 
             for index in range(2, len(current_text)):
@@ -115,7 +115,7 @@ class VigenereHacker(Hacker):
         :param text: Text for calculating
         :return: Coincidence index for text
         """
-        count = [0 for letter in range(26)]
+        count = [0 for letter in range(ALPHABET_POWER)]
         sum_count = 0
 
         for letter in text:
@@ -127,7 +127,7 @@ class VigenereHacker(Hacker):
             return 0
 
         result = 0
-        for letter in range(26):
+        for letter in range(ALPHABET_POWER):
             result += (count[letter] * (count[letter] - 1)) / (sum_count * (sum_count - 1))
 
         return result

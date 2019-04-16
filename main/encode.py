@@ -1,5 +1,7 @@
 import abc
 
+from .config import ALPHABET_POWER, ASCII_BIT_COUNT
+
 
 class Encoder:
     """
@@ -45,7 +47,7 @@ class CaesarEncoder(Encoder):
     """
 
     def __init__(self, key):
-        key = int(key) % 26
+        key = int(key) % ALPHABET_POWER
         super().__init__(key)
 
     def calc(self, symbol: str, position: int):
@@ -56,7 +58,7 @@ class CaesarEncoder(Encoder):
         :return: Calculated symbol
         """
         code_a = ord('A') if symbol.isupper() else ord('a')
-        return chr(code_a + (ord(symbol) - code_a + self.key) % 26)
+        return chr(code_a + (ord(symbol) - code_a + self.key) % ALPHABET_POWER)
 
 
 class VigenereEncoder(Encoder):
@@ -76,7 +78,8 @@ class VigenereEncoder(Encoder):
         :return: Calculated symbol
         """
         code_a = ord('A') if symbol.isupper() else ord('a')
-        return chr(code_a + (ord(symbol) + ord(self.key[position % len(self.key)]) - code_a - ord('a')) % 26)
+        return chr(
+            code_a + (ord(symbol) + ord(self.key[position % len(self.key)]) - code_a - ord('a')) % ALPHABET_POWER)
 
 
 class CaesarDecoder(Encoder):
@@ -85,7 +88,7 @@ class CaesarDecoder(Encoder):
     """
 
     def __init__(self, key):
-        key = int(key) % 26
+        key = int(key) % ALPHABET_POWER
         super().__init__(key)
 
     def calc(self, symbol: str, position: int):
@@ -96,7 +99,7 @@ class CaesarDecoder(Encoder):
         :return: Calculated symbol
         """
         code_a = ord('A') if symbol.isupper() else ord('a')
-        return chr(code_a + (ord(symbol) - code_a + 26 - self.key) % 26)
+        return chr(code_a + (ord(symbol) - code_a + ALPHABET_POWER - self.key) % ALPHABET_POWER)
 
 
 class VigenereDecoder(Encoder):
@@ -116,7 +119,8 @@ class VigenereDecoder(Encoder):
         :return: Calculated symbol
         """
         code_a = ord('A') if symbol.isupper() else ord('a')
-        return chr(code_a + (ord(symbol) - code_a - ord(self.key[position % len(self.key)]) + ord('a') + 26) % 26)
+        return chr(code_a + (ord(symbol) - code_a - ord(self.key[position % len(self.key)]) + ord(
+            'a') + ALPHABET_POWER) % ALPHABET_POWER)
 
 
 class VernamEncoder:
@@ -155,6 +159,6 @@ class VernamDecoder:
         """
         binary_result = bin(self.key ^ int(text, 2))[2:]
         result = ''
-        for symbol in range(0, len(binary_result), 7):
-            result += chr(int(binary_result[symbol:symbol + 7], 2))
+        for symbol in range(0, len(binary_result), ASCII_BIT_COUNT):
+            result += chr(int(binary_result[symbol:symbol + ASCII_BIT_COUNT], 2))
         return result
