@@ -5,6 +5,7 @@ from main.encode import CaesarDecoder
 from main.train import DefaultTrainer
 from main.config import ALPHABET_POWER
 
+
 class Hacker:
     """
     Abstract class for hacking text
@@ -45,16 +46,22 @@ class CaesarHacker(Hacker):
         results = [0 for shift in range(ALPHABET_POWER)]
         shift_result = 0
 
-        for shift in range(ALPHABET_POWER):
-            self.trainer.feed(self.caesar_decoders[shift].encode(text))
-            current_model = self.trainer.get_model()
+        self.trainer.feed(text)
+        current_model = self.trainer.get_model()
 
+        for shift in range(ALPHABET_POWER):
             for letter in string.ascii_lowercase:
                 results[shift] += (self.model.get(letter, 0) - current_model.get(letter, 0)) ** 2
 
-            self.trainer.clear()
             if results[shift] < results[shift_result]:
                 shift_result = shift
+
+            next_model = {}
+            for letter in string.ascii_lowercase[:-1]:
+                next_model[chr(ord(letter) + 1)] = current_model[letter]
+            next_model['a'] = current_model['z']
+
+            current_model = next_model
 
         return self.caesar_decoders[shift_result].encode(text)
 

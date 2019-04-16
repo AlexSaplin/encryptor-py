@@ -1,6 +1,6 @@
 import abc
 
-from .config import ALPHABET_POWER, ASCII_BIT_COUNT
+from main.config import ALPHABET_POWER, ASCII_BIT_COUNT
 
 
 class Encoder:
