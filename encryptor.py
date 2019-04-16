@@ -99,7 +99,7 @@ if __name__ == '__main__':
     parser_hack.add_argument('--output-file', type=argparse.FileType('w'), help='Output file')
     parser_hack.add_argument('--model-file', type=argparse.FileType('r'), help='Model file', required=True)
     parser_hack.add_argument('--bonus', dest='bonus_mode', action='store_true')
-    parser_train.add_argument('--n', type=int, help='Size of a n-chart model')
+    parser_hack.add_argument('--n', type=int, help='Size of a n-chart model')
 
     arguments = parser.parse_args()
     arguments.func(arguments)
