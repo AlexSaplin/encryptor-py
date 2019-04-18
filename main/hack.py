@@ -1,5 +1,6 @@
 import abc
 import string
+from copy import deepcopy
 
 from main.encode import CaesarDecoder
 from main.train import DefaultTrainer
@@ -56,10 +57,10 @@ class CaesarHacker(Hacker):
             if results[shift] < results[shift_result]:
                 shift_result = shift
 
-            next_model = {}
-            for letter in string.ascii_lowercase[:-1]:
-                next_model[chr(ord(letter) + 1)] = current_model[letter]
-            next_model['a'] = current_model['z']
+            next_model = deepcopy(current_model)
+            for letter_id in range(ALPHABET_POWER):
+                next_model[string.ascii_lowercase[letter_id]] = current_model[
+                    string.ascii_lowercase[(letter_id + 1) % ALPHABET_POWER]]
 
             current_model = next_model
 
