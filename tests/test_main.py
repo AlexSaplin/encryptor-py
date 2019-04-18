@@ -111,4 +111,3 @@ class TestTrainerHacker:
 
         hacker = CaesarBonusHacker(model, n)
         assert hacker.hack(encrypted_text) == text
-
