@@ -109,6 +109,8 @@ class VigenereDecoder(Encoder):
 
     def __init__(self, key):
         key = key.lower()
+        if not key.isalpha():
+            raise Exception('Key must be single word')
         super().__init__(key)
 
     def calc(self, symbol: str, position: int):

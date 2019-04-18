@@ -64,6 +64,8 @@ class CaesarHacker(Hacker):
 
             current_model = next_model
 
+        self.trainer.clear()
+
         return self.caesar_decoders[shift_result].encode(text)
 
 
@@ -161,11 +163,16 @@ class VigenereHacker(Hacker):
         letter_text = ''.join(letters)
 
         len_ic = []
-        for length in range(1, len(letter_text)):
-            len_ic.append(self.check_length(letter_text, length))
+        current_length = 1
+        while current_length * current_length < len(letter_text):
+            len_ic.append(self.check_length(letter_text, current_length))
+            current_length += 1
 
         key_len = 1
         for length, coincidence_index in enumerate(len_ic):
+            if self.coincidence_index < coincidence_index:
+                key_len = length + 1
+                break
             if abs(coincidence_index - self.coincidence_index) < abs(len_ic[key_len - 1] - self.coincidence_index):
                 key_len = length + 1
 
