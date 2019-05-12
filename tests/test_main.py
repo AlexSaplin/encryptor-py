@@ -46,10 +46,10 @@ class TestEncodeDecode:
 class TestTrainerHacker:
 
     @pytest.mark.parametrize("train_filename, text_filename, key", [
-        ('src/1.txt', 'src/2.txt', 5),
-        ('src/3.txt', 'src/4.txt', 7),
-        ('src/2.txt', 'src/3.txt', 11),
-        ('src/4.txt', 'src/2.txt', 13)
+        ('tests/src/1.txt', 'tests/src/2.txt', 5),
+        ('tests/src/3.txt', 'tests/src/4.txt', 7),
+        ('tests/src/2.txt', 'tests/src/3.txt', 11),
+        ('tests/src/4.txt', 'tests/src/2.txt', 13)
     ])
     def test_main_caesar_hacker(self, train_filename, text_filename, key):
         train_file = open(train_filename, 'r')
@@ -68,10 +68,10 @@ class TestTrainerHacker:
         assert hacker.hack(encrypted_text) == text
 
     @pytest.mark.parametrize("train_filename, text_filename, key_length", [
-        ('src/1.txt', 'src/2.txt', 2),
-        ('src/3.txt', 'src/4.txt', 97),
-        ('src/2.txt', 'src/3.txt', 31),
-        ('src/4.txt', 'src/2.txt', 14)
+        ('tests/src/1.txt', 'tests/src/2.txt', 2),
+        ('tests/src/3.txt', 'tests/src/4.txt', 97),
+        ('tests/src/2.txt', 'tests/src/3.txt', 31),
+        ('tests/src/4.txt', 'tests/src/2.txt', 14)
     ])
     def test_vigenere_hacker(self, train_filename, text_filename, key_length):
         train_file = open(train_filename, 'r')
@@ -91,10 +91,10 @@ class TestTrainerHacker:
         assert hacker.hack(encrypted_text) == text
 
     @pytest.mark.parametrize("train_filename, text_filename, key, n", [
-        ('src/1.txt', 'src/2.txt', 5, 3),
-        ('src/3.txt', 'src/4.txt', 7, 4),
-        ('src/2.txt', 'src/3.txt', 11, 2),
-        ('src/4.txt', 'src/2.txt', 13, 6)
+        ('tests/src/1.txt', 'tests/src/2.txt', 5, 3),
+        ('tests/src/3.txt', 'tests/src/4.txt', 7, 4),
+        ('tests/src/2.txt', 'tests/src/3.txt', 11, 2),
+        ('tests/src/4.txt', 'tests/src/2.txt', 13, 6)
     ])
     def test_bonus_caesar_hacker(self, train_filename, text_filename, key, n):
         train_file = open(train_filename, 'r')
